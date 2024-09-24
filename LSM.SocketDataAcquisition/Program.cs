@@ -46,7 +46,37 @@ class LsmSocketDataAcquisitionCon
             // Create a list to store the full response
             List<byte> fullResponse = new List<byte>();
 
+            // Buffer to store incoming bytes
+            byte[] buffer = new byte[256];
 
+            try
+            {
+                int bytesRead; 
+                while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    // Add the received bytes to the full response
+                    fullResponse.AddRange(buffer.Take(bytesRead));
+
+                    // Check if all data has been received
+                    if (!stream.DataAvailable)
+                    {
+                        break;
+                    }
+                }
+
+                byte[] responseBytes = fullResponse.ToArray();
+
+                // TODO: Process the response bytes
+                // ProcessResponse(responseBytes);
+            } 
+            catch (IOException ex)
+            {
+                // Handle read timeout or other IO exceptions
+                Console.WriteLine($"IOException: {ex.Message}");
+            }
+
+            // close the stream and client
+            stream.Close();
             client.Close();
             Console.WriteLine("Connection Closed");
         }
